@@ -1,0 +1,26 @@
+{
+  "name": "anycalendar",
+  "version": "1.0.0",
+  "description": "安德森极简工作日历 | AnyCalendar",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "bcryptjs": "^3.0.3",
+    "next": "^16.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.6",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}
