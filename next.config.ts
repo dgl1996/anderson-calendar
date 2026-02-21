@@ -1,8 +1,14 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  allowedDevOrigins: ['*.dev.coze.site'],
+  images: {
+    remotePatterns: [{
+      protocol: 'https',
+      hostname: 'lf-coze-web-cdn.coze.cn',
+      pathname: '/**'
+    }]
+  }
 };
 
 export default nextConfig;
-EOF && echo "✅ 彻底清理完成" && cat next.config.ts
