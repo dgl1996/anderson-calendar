@@ -1,9 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
-// 直接从环境变量读取
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'missing-url';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'missing-key';
+// 修改环境变量读取方式（支持服务端和客户端）
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'missing-url';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'missing-key';
+
+console.log('数据库初始化API配置检查:');
+console.log('URL来源:', process.env.SUPABASE_URL ? 'SUPABASE_URL' : process.env.NEXT_PUBLIC_SUPABASE_URL ? 'NEXT_PUBLIC_SUPABASE_URL' : '未设置');
+console.log('Key来源:', process.env.SUPABASE_ANON_KEY ? 'SUPABASE_ANON_KEY' : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'NEXT_PUBLIC_SUPABASE_ANON_KEY' : '未设置');
 
 export async function POST() {
   try {

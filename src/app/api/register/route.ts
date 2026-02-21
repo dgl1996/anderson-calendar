@@ -1,14 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
-// 直接从环境变量读取，添加详细的调试信息
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'missing-url';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'missing-key';
+// 修改环境变量读取方式（支持服务端和客户端）
+// NEXT_PUBLIC_前缀的变量在API路由中无法读取，需要添加服务端变量
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'missing-url';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'missing-key';
 
+// 添加调试日志确认变量读取
 console.log('Supabase配置检查:');
-console.log('URL配置:', supabaseUrl ? '已设置' : '未设置');
-console.log('URL长度:', supabaseUrl?.length || 0);
-console.log('Key配置:', supabaseAnonKey ? '已设置' : '未设置');
+console.log('URL来源:', process.env.SUPABASE_URL ? 'SUPABASE_URL' : process.env.NEXT_PUBLIC_SUPABASE_URL ? 'NEXT_PUBLIC_SUPABASE_URL' : '未设置');
+console.log('URL值:', supabaseUrl);
+console.log('Key来源:', process.env.SUPABASE_ANON_KEY ? 'SUPABASE_ANON_KEY' : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'NEXT_PUBLIC_SUPABASE_ANON_KEY' : '未设置');
 console.log('Key长度:', supabaseAnonKey?.length || 0);
 
 export async function POST(req: Request) {
