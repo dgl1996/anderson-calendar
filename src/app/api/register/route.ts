@@ -1,15 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
-// 服务端环境变量（必须使用非NEXT_PUBLIC前缀）
+// 服务端环境变量
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
 
 export async function POST(req: Request) {
   try {
-    // 验证环境变量
+    console.log('🔍 API注册请求开始');
+    console.log('环境变量检查:');
+    console.log('SUPABASE_URL存在:', !!supabaseUrl);
+    console.log('SUPABASE_ANON_KEY存在:', !!supabaseAnonKey);
+
     if (!supabaseUrl || !supabaseAnonKey) {
-      console.error('环境变量缺失:', { urlExists: !!supabaseUrl, keyExists: !!supabaseAnonKey });
+      console.error('❌ 环境变量缺失');
       return NextResponse.json(
         { success: false, error: '服务器配置错误：缺少数据库连接信息' },
         { status: 500 }
@@ -35,62 +39,40 @@ export async function POST(req: Request) {
 
     // 创建Supabase客户端
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    console.log('✅ Supabase客户端创建成功');
 
-    // 检查手机号是否已存在
-    const { data: existingUser, error: queryError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('phone', phone)
-      .maybeSingle();
-
-    if (queryError) {
-      console.error('查询用户失败:', queryError);
-      return NextResponse.json(
-        { success: false, error: '数据库查询失败' },
-        { status: 500 }
-      );
-    }
-
-    if (existingUser) {
-      return NextResponse.json(
-        { success: false, error: '该手机号已注册' },
-        { status: 400 }
-      );
-    }
-
-    // 创建新用户（简化版，先验证流程）
-    const { data: newUser, error: createError } = await supabase
+    // 简化：直接创建用户
+    const { data, error } = await supabase
       .from('users')
       .insert({
         phone,
-        password_hash: password, // 先明文存储，验证成功后再加密
+        password_hash: password, // 暂时明文
         nickname: `用户${phone.slice(-4)}`,
         plan: 'free'
       })
       .select()
       .single();
 
-    if (createError) {
-      console.error('创建用户失败:', createError);
+    if (error) {
+      console.error('❌ 创建用户失败:', error);
       return NextResponse.json(
-        { success: false, error: createError.message },
+        { success: false, error: error.message },
         { status: 500 }
       );
     }
 
-    console.log('用户注册成功:', newUser.id);
-
+    console.log('✅ 用户注册成功:', data.id);
     return NextResponse.json({
       success: true,
       user: {
-        id: newUser.id,
-        phone: newUser.phone,
-        nickname: newUser.nickname
+        id: data.id,
+        phone: data.phone,
+        nickname: data.nickname
       },
       message: '注册成功'
     });
   } catch (error: any) {
-    console.error('注册API异常:', error);
+    console.error('❌ API异常:', error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }

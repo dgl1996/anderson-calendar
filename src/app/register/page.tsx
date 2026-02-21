@@ -1,104 +1,54 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { useState } from 'react';
 
-// 诊断：检查环境变量
-console.log('🔍 注册页面环境变量诊断:');
-console.log('NEXT_PUBLIC_SUPABASE_URL 存在:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
-console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY 存在:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-console.log('NEXT_PUBLIC_SUPABASE_URL 值:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY 长度:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length || 0);
-
-// 创建Supabase客户端
-let supabase;
-try {
-  supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-  console.log('✅ Supabase客户端创建成功');
-} catch (error) {
-  console.error('❌ Supabase客户端创建失败:', error);
-  supabase = null;
-}
-
-export default function Register() {
+export default function RegisterPage() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
-
-    console.log('🔍 注册表单提交诊断:');
-    console.log('手机号:', phone);
-    console.log('密码长度:', password.length);
-    console.log('Supabase客户端状态:', supabase ? '正常' : '创建失败');
+    setMessage('');
 
     try {
-      if (!supabase) {
-        throw new Error('Supabase客户端初始化失败，请检查环境变量');
+      // 直接从window对象获取环境变量（构建时不会检查）
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+      
+      console.log('🔍 环境变量检查:');
+      console.log('URL存在:', !!supabaseUrl);
+      console.log('Key存在:', !!supabaseAnonKey);
+
+      if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error('数据库连接配置缺失，请检查环境变量');
       }
 
-      // 诊断：测试Supabase连接
-      console.log('🔍 测试Supabase连接...');
-      const { data: testData, error: testError } = await supabase
-        .from('users')
-        .select('count')
-        .limit(1);
+      // 动态导入Supabase客户端，避免构建时错误
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-      if (testError) {
-        console.error('❌ Supabase连接测试失败:', testError);
-        throw new Error('数据库连接失败: ' + testError.message);
+      // 简化注册：直接调用API，不检查用户是否存在
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setMessage('注册成功！请登录。');
+        setPhone('');
+        setPassword('');
+      } else {
+        setMessage(`注册失败: ${data.error}`);
       }
-      console.log('✅ Supabase连接测试成功');
-
-      // 检查手机号是否已存在
-      console.log('🔍 检查手机号是否已存在...');
-      const { data: existingUser, error: queryError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('phone', phone)
-        .maybeSingle();
-
-      if (queryError) {
-        console.error('❌ 查询用户失败:', queryError);
-        throw new Error('查询用户失败: ' + queryError.message);
-      }
-
-      if (existingUser) {
-        console.log('❌ 手机号已存在:', phone);
-        throw new Error('该手机号已注册');
-      }
-
-      // 创建新用户
-      console.log('🔍 创建新用户...');
-      const { data, error } = await supabase
-        .from('users')
-        .insert({
-          phone,
-          password_hash: password, // 简化：先明文存储
-          nickname: `用户${phone.slice(-4)}`,
-          plan: 'free'
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('❌ 创建用户失败:', error);
-        throw new Error('注册失败: ' + error.message);
-      }
-
-      console.log('✅ 用户注册成功:', data.id);
-      alert('注册成功！');
-      window.location.href = '/dashboard';
-    } catch (err: any) {
-      console.error('❌ 注册过程异常:', err);
-      setError(err.message);
+    } catch (error: any) {
+      console.error('注册错误:', error);
+      setMessage(`注册失败: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -140,9 +90,9 @@ export default function Register() {
             {loading ? '注册中...' : '注册'}
           </button>
         </form>
-        {error && (
-          <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
-            {error}
+        {message && (
+          <div className={`mt-4 p-3 rounded ${message.includes('成功') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+            {message}
           </div>
         )}
         <p className="mt-4 text-sm text-gray-600">
