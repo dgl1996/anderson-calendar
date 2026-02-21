@@ -84,4 +84,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-EOF && echo "✅ 注册页面文件创建完成"

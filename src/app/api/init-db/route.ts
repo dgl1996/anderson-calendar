@@ -101,4 +101,3 @@ export async function GET() {
     instructions: '发送 POST 请求到 /api/init-db 自动初始化数据库'
   });
 }
-EOF && echo "✅ 数据库初始化API文件创建完成"

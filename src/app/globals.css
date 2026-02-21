@@ -57,4 +57,3 @@
     @apply bg-background text-foreground;
   }
 }
-EOF && echo "✅ 全局样式文件创建完成"

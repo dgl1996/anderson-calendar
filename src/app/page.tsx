@@ -14,4 +14,3 @@ export default function HomePage() {
     </div>
   );
 }
-EOF && echo "✅ 主页文件创建完成"

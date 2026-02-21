@@ -151,4 +151,3 @@ export async function POST(req: Request) {
     );
   }
 }
-EOF && echo "✅ 注册API文件创建完成（SQL表路径已修正）"
