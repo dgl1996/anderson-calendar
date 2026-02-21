@@ -1,11 +1,8 @@
-import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
-  output: 'standalone',
-  distDir: 'dist',
-  images: {
-    unoptimized: true,
-  },
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
 };
 
 export default nextConfig;
+EOF && echo "✅ 彻底清理完成" && cat next.config.ts
