@@ -9,7 +9,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function Register() {
+export default function LoginPage() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -21,38 +21,23 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // 检查手机号是否已存在
-      const { data: existingUser, error: queryError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('phone', phone)
-        .maybeSingle();
-
-      if (queryError) {
-        throw new Error('查询用户失败: ' + queryError.message);
-      }
-
-      if (existingUser) {
-        throw new Error('该手机号已注册');
-      }
-
-      // 创建新用户
+      // 查询用户
       const { data, error } = await supabase
         .from('users')
-        .insert({
-          phone,
-          password_hash: password, // 简化：先明文存储
-          nickname: `用户${phone.slice(-4)}`,
-          plan: 'free'
-        })
-        .select()
+        .select('*')
+        .eq('phone', phone)
+        .eq('password_hash', password)
         .single();
 
       if (error) {
-        throw new Error('注册失败: ' + error.message);
+        throw new Error('登录失败: ' + error.message);
       }
 
-      alert('注册成功！');
+      if (!data) {
+        throw new Error('手机号或密码错误');
+      }
+
+      alert('登录成功！');
       window.location.href = '/dashboard';
     } catch (err: any) {
       setError(err.message);
@@ -64,7 +49,7 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6">注册账号</h1>
+        <h1 className="text-2xl font-bold mb-6">登录账号</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">手机号</label>
@@ -84,9 +69,8 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-2 border rounded"
-              placeholder="至少6位字符"
+              placeholder="请输入密码"
               required
-              minLength={6}
             />
           </div>
           <button
@@ -94,7 +78,7 @@ export default function Register() {
             disabled={loading}
             className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? '注册中...' : '注册'}
+            {loading ? '登录中...' : '登录'}
           </button>
         </form>
         {error && (
@@ -103,7 +87,7 @@ export default function Register() {
           </div>
         )}
         <p className="mt-4 text-sm text-gray-600">
-          已有账号？<a href="/login" className="text-blue-600 hover:underline">登录</a>
+          没有账号？<a href="/register" className="text-blue-600 hover:underline">立即注册</a>
         </p>
       </div>
     </div>

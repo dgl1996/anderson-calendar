@@ -1,4 +1,3 @@
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
 
 export default function Home() {
@@ -13,22 +12,18 @@ export default function Home() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition">
-                  登录 / 注册
-                </button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton afterSignOutUrl="/" />
-              <Link 
-                href="/dashboard" 
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition"
-              >
-                进入日历
-              </Link>
-            </SignedIn>
+            <Link 
+              href="/register" 
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+            >
+              注册
+            </Link>
+            <Link 
+              href="/login" 
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition"
+            >
+              登录
+            </Link>
           </div>
         </nav>
 
@@ -41,13 +36,12 @@ export default function Home() {
             安德森极简工作日历，专为高效工作者设计。简洁界面，强大功能，让您的工作安排更加井然有序。
           </p>
           
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-lg rounded-lg transition transform hover:scale-105">
-                立即开始免费使用
-              </button>
-            </SignInButton>
-          </SignedOut>
+          <Link 
+            href="/register" 
+            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-lg rounded-lg transition transform hover:scale-105"
+          >
+            立即开始免费使用
+          </Link>
           
           <SignedIn>
             <Link 
