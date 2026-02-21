@@ -1,16 +1,27 @@
-export const metadata = {
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { ClerkProviderWrapper } from './clerk-provider'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
   title: '安德森极简工作日历',
-  description: '专为管理人员设计的极简工作日历',
-};
+  description: '简洁高效的工作日历工具',
+}
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body className={inter.className}>
+        <ClerkProviderWrapper>
+          {children}
+        </ClerkProviderWrapper>
+      </body>
     </html>
-  );
+  )
 }
